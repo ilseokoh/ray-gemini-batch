@@ -47,19 +47,4 @@ ray_cluster_name                = "ray-cluster"
 enable_grafana_on_ray_dashboard = false
 enable_gpu                      = false
 
-## IAP config - if you choose to disable IAP authenticated access for your endpoints, ignore everthing below this line.
-create_brand  = false
-support_email = "<email>" ## specify if create_brand=true
-
-## Ray Dashboard IAP Settings
-ray_dashboard_add_auth                 = false # Set to true when using auth with IAP
-ray_dashboard_k8s_ingress_name         = "ray-dashboard-ingress"
-ray_dashboard_k8s_managed_cert_name    = "ray-dashboard-managed-cert"
-ray_dashboard_k8s_iap_secret_name      = "ray-dashboard-iap-secret"
-ray_dashboard_k8s_backend_config_name  = "ray-dashboard-iap-config"
-ray_dashboard_k8s_backend_service_port = 8265
-
-ray_dashboard_domain            = "ray.example.com"
-ray_dashboard_client_id         = ""
-ray_dashboard_client_secret     = ""
-ray_dashboard_members_allowlist = "user:<email>,group:<email>,serviceAccount:<email>,domain:google.com"
+ray_dashboard_add_auth          = false

@@ -143,7 +143,7 @@ module "kuberay-workload-identity" {
   name                            = local.workload_identity_service_account
   namespace                       = local.kubernetes_namespace
   project_id                      = var.project_id
-  roles                           = ["roles/storage.objectUser", "roles/bigquery.user", "roles/aiplatform.user"]
+  roles                           = ["roles/storage.objectUser", "roles/bigquery.user", "roles/aiplatform.user", "roles/bigquery.dataOwner"]
   automount_service_account_token = true
   depends_on                      = [module.namespace]
 }

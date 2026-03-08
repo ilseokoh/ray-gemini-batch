@@ -206,3 +206,39 @@ helm repo add kuberay https://ray-project.github.io/kuberay-helm/
 helm repo update
 helm install raycluster kuberay/ray-cluster --version 1.5.1
 ```
+
+
+
+#### 1. Create GKE Cluster 
+```bash
+gcloud container clusters create-auto ray-enabled-gke \
+    --enable-ray-operator \
+    --enable-ray-cluster-monitoring \
+    --enable-ray-cluster-logging \
+    --location=asia-northeast3 
+```
+
+#### 2. Run terraform 
+
+```bash
+gcloud auth application-default login
+cd terraform
+terraform init
+terraform apply --var-file=workloads.tfvars
+```
+```
+kubectl get raycluster
+kubectl get pods
+```
+
+#### 3. Test job running properly
+
+```
+kubectl ray session ray-cluster-kuberay
+cd app
+uv sync
+uv run ray job submit --address http://localhost:8265 --runtime-env=env.yaml -- python bucket-test.py
+cd ..
+```
+
+#### 4. 
