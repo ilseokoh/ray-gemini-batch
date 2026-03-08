@@ -1,0 +1,12 @@
+apiVersion: cloud.google.com/v1
+kind: ComputeClass
+metadata:
+  name: n2-128-class
+spec:
+  nodePoolAutoCreation:
+    enabled: true
+  priorities:
+  - machineFamily: n2
+    minCores: 128
+    minMemoryGb: 512
+  whenUnsatisfiable: DoNotScaleUp

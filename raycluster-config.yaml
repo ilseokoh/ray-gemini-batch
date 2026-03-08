@@ -1,0 +1,45 @@
+apiVersion: ray.io/v1
+kind: RayCluster
+metadata:
+  name: raycluster-autoscaler
+spec:
+  headGroupSpec:
+    # Service type for the head node
+    serviceType: ClusterIP
+    # Ray container configuration for the head pod
+    rayStartParams:
+      # Command line arguments for starting Ray on the head node
+      dashboard-host: "0.0.0.0"
+    template:
+      spec:
+        serviceAccountName: ray-user
+        containers:
+        - name: ray-head
+          image: "rayproject/ray:latest" # Ensure the image matches rayVersion
+          ports:
+          - containerPort: 6379 # Ray port
+            name: gcs
+          - containerPort: 8265 # Ray dashboard port
+            name: dashboard
+          - containerPort: 10001 # Ray client port
+            name: client
+          resources:
+            requests:
+              cpu: "2"
+              memory: "8Gi"
+  workerGroupSpecs:
+  - groupName: big-group
+    replicas: 1
+    minReplicas: 1
+    maxReplicas: 10
+    rayStartParams: {} # Add worker-specific start params here if needed
+    template:
+      spec:
+        serviceAccountName: ray-user
+        containers:
+        - name: ray-worker
+          image: "rayproject/ray:latest" # Ensure the image matches rayVersion
+          resources:
+            requests:
+              cpu: "128"
+              memory: "512Gi"

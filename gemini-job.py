@@ -3,6 +3,15 @@ import os
 
 ray.init()
 
+# Read from a SQL query of the dataset. Do not specify dataset.
+ds = ray.data.read_bigquery(
+    project_id="kevin-ai-playground",
+    query = "SELECT * FROM `csv_parse_ds.csv_files_object_table`",
+)
+
+print(ds.schema())
+ds.show()
+
 @ray.remote
 class Counter:
     def __init__(self):

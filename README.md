@@ -108,3 +108,101 @@ gcsfs 의 auth : https://gcsfs.readthedocs.io/en/latest/#credentials
 ## Monitoring 
 
 Ray Dashboard 를 통해서 Task 1 의 Status를 보면 진행율을 알 수 있을 것으로 예상 
+
+## GKE Workload Identity Federation 
+
+BQ, Gemini 리소스 엑세스를 위한 설정: [GKE 워크로드에서 Google Cloud API에 인증](https://docs.cloud.google.com/kubernetes-engine/docs/how-to/workload-identity?hl=ko)
+
+[Configuring KubeRay to use Google Cloud Storage Buckets in GKE](https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/gke-gcs-bucket.html)
+
+1. Kubernetes ServiceAccount 생성 
+```
+kubectl create serviceaccount ray-sa 
+```
+1. Kubernetes ServiceAccount를 참조하는 IAM 허용정책 
+```
+gcloud projects add-iam-policy-binding projects/kevin-ai-playground \
+    --role=roles/bigquery.user \
+    --member=principal://iam.googleapis.com/projects/834471899683/locations/global/workloadIdentityPools/kevin-ai-playground.svc.id.goog/subject/ns/default/sa/ray-sa \
+    --condition=None
+```
+
+
+### Setup
+
+#### 1. Create GKE Cluster 
+```bash
+gcloud container clusters create-auto ray-enabled-gke \
+    --enable-ray-operator \
+    --enable-ray-cluster-monitoring \
+    --enable-ray-cluster-logging \
+    --location=asia-northeast3 
+```
+
+#### 2. Configure kubectl to communicate with your cluster
+```
+gcloud container clusters get-credentials ray-enabled-cluster --location=asia-northeast3 
+```
+
+#### 3. Create Kubernetes ServiceAccount 
+```
+gcloud container clusters update ray-enabled-cluster --region=asia-northeast3 --workload-pool=kevin-ai-playground.svc.id.goog
+
+kubectl create serviceaccount ray-user --namespace default
+
+gcloud iam service-accounts create ray-user --display-name "Ray User"
+gcloud projects add-iam-policy-binding kevin-ai-playground --member "serviceAccount:ray-user@kevin-ai-playground.iam.gserviceaccount.com" --role "roles/storage.objectUser"
+
+gcloud projects add-iam-policy-binding kevin-ai-playground --member "serviceAccount:ray-user@kevin-ai-playground.iam.gserviceaccount.com" --role "roles/bigquery.user"
+
+gcloud iam service-accounts add-iam-policy-binding ray-user@kevin-ai-playground.iam.gserviceaccount.com --member "serviceAccount:kevin-ai-playground.svc.id.goog[default/ray-user]" --role "roles/iam.workloadIdentityUser"
+
+kubectl annotate serviceaccount ray-user --namespace=default iam.gke.io/gcp-service-account=ray-user@kevin-ai-playgound.iam.gserviceaccount.com
+
+```
+
+#### . 
+```bash
+gcloud workstations start-tcp-tunnel \
+    --project=kevin-ai-playground \
+    --region=asia-northeast3 \
+    --cluster=kevin-ws-cluster \
+    --config=kevin-ws-config  \
+    --local-host-port=localhost:1025  \
+    kevin-workstation 22
+```
+
+#### Create the custom compute class in your cluster
+
+```
+kubectl apply -f compute-class.yaml
+```
+
+#### Create Ray Cluster
+```
+kubectl ray create cluster ray-cluster \
+      --worker-replicas=1 \
+      --worker-cpu=128 \
+      --worker-memory=512Gi \
+      --worker-node-selectors="cloud.google.com/compute-class=n2-128-class"
+
+kubectl ray get cluster
+```
+```
+kubectl apply -f raycluster-config.yaml
+```
+
+```
+kubectl ray delete ray-cluster
+```
+
+```
+kubectl ray session ray-cluster
+```
+
+
+```
+helm repo add kuberay https://ray-project.github.io/kuberay-helm/
+helm repo update
+helm install raycluster kuberay/ray-cluster --version 1.5.1
+```
