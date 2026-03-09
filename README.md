@@ -216,6 +216,8 @@ gcloud container clusters create-auto ray-enabled-gke \
     --enable-ray-cluster-monitoring \
     --enable-ray-cluster-logging \
     --location=asia-northeast3 
+gcloud container clusters get-credentials ray-enabled-gke --location=asia-northeast3
+kubectl ray session ray-cluster-kuberay
 ```
 
 #### 2. Run terraform 
