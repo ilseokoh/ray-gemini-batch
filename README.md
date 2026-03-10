@@ -19,8 +19,6 @@ gcloud container clusters create-auto ray-enabled-gke \
 gcloud container clusters get-credentials ray-enabled-gke --location=asia-northeast3
 ```
 
-
-
 ### Terraform으로 나머지 설정 
 
 GKE AI Labs 사이트의 [Ray on GKE 문서](https://gke-ai-labs.dev/docs/tutorials/workflow-orchestration/ray-on-gke/)에 설명되어 있는 [GitHub](https://github.com/ai-on-gke/quick-start-guides)의 Terraform 의 코드를 가져왔다. 
@@ -42,6 +40,11 @@ create_cluster    = false
 # Workload identity SA 를 사용
 create_service_account            = true
 workload_identity_service_account = "ray-sa"
+```
+
+Terraform 실행 
+```
+terraform 
 ```
 
 GKE 상태 확인 
