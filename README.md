@@ -44,7 +44,8 @@ workload_identity_service_account = "ray-sa"
 
 Terraform 실행 
 ```
-terraform 
+terraform init
+terraform apply --var-file=workloads.tfvars
 ```
 
 GKE 상태 확인 

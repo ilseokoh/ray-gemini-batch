@@ -166,6 +166,7 @@ module "gcs" {
   count       = var.create_gcs_bucket ? 1 : 0
   project_id  = var.project_id
   bucket_name = var.gcs_bucket
+  region      = "asia-northeast3"
 }
 
 module "kuberay-cluster" {
