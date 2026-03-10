@@ -1,5 +1,55 @@
 # ray-gemini-batch
 
+수십만개의 Gemini 호출을 수행해야 하는 과제에서는 분산/병렬처리가 필요하다. 병렬처리를 위해서 Ray 를 선택하고 GKE(Google Kubernetes Engine)에서 Ray를 운영하면서 대량의 Gemini 호출 테스크를 수행하는 인프라와 Ray용 Application에 대한 예제. 
+
+## GKE 인프라 생성 
+
+### gcloud 로 --enable-ray-operator 옵션과 함께 cluster를 생성
+
+default VPC가 없다면 Cluster 생성시 --network 를 지정해야 한다. 
+
+```bash
+gcloud container clusters create-auto ray-enabled-gke \
+    --enable-ray-operator \
+    --enable-ray-cluster-monitoring \
+    --enable-ray-cluster-logging \
+    --location=asia-northeast3 \
+    --network=<your vpc name> \
+    --subnetwork=<your subent name>
+gcloud container clusters get-credentials ray-enabled-gke --location=asia-northeast3
+```
+
+
+
+### Terraform으로 나머지 설정 
+
+GKE AI Labs 사이트의 [Ray on GKE 문서](https://gke-ai-labs.dev/docs/tutorials/workflow-orchestration/ray-on-gke/)에 설명되어 있는 [GitHub](https://github.com/ai-on-gke/quick-start-guides)의 Terraform 의 코드를 가져왔다. 
+
+- Google API 호출을 위한 Workload Identity Federation 설정
+- Monitoring / Logging 설정 
+
+```
+git clone https://github.com/ilseokoh/ray-gemini-batch.git
+cd ray-gemini-batch/terraform
+```
+
+workloads.tfvars 확인 
+```yaml
+project_id = "<your project id>"
+cluster_name     = "ray-enabled-gke"
+cluster_location = "asia-northeast3"
+create_cluster    = false
+# Workload identity SA 를 사용
+create_service_account            = true
+workload_identity_service_account = "ray-sa"
+```
+
+GKE 상태 확인 
+```
+kubectl get nodes
+
+```
+
 
 ```bash
 gcloud container clusters get-credentials my-ray-enabled-cluster --location=us-central1
@@ -244,3 +294,13 @@ cd ..
 ```
 
 #### 4. 
+
+#### Stop and Delete job 
+
+```
+uv run ray job delete --address http://localhost:8265 0f000000
+```
+
+```
+uv run ray job stop --address http://localhost:8265 0f000000
+```

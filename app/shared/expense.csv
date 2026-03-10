@@ -1,0 +1,88 @@
+날짜,부서,비용_유형,서비스,프로젝트ID,비용,사용_단위,사용량,비고
+2025-01-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,1520.5,슬롯_시간,5200,프로덕션 데이터 분석을 위한 BigQuery 슬롯 활용
+2025-01-02,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-01-05,Sales,클라우드_서비스,Cloud_Run,nol-universe-dev,85.25,요청,550000,영업 대시보드용 API
+2025-01-07,Marketing,마케팅_캠페인,Google_Ads,nol-universe-dev,1200,클릭,8500,1분기 브랜드 인지도 캠페인
+2025-01-10,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,95.75,GB,3500,고객 로그 및 백업 저장
+2025-01-15,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,320,세션,25000,고객 문의용 자동 챗봇
+2025-01-20,Sales,출장,항공권,N/A,350,건,1,고객 미팅을 위한 부산 출장
+2025-01-25,Marketing,SaaS,Mailchimp,N/A,55,사용자,2,이메일 마케팅 툴 구독
+2025-01-30,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,210.5,시간,150,프로덕션 백엔드 서버 운영
+2025-02-02,IT,클라우드_서비스,BigQuery,nol-universe-prod,1850.75,슬롯_시간,6100,BigQuery 슬롯 사용량 증가
+2025-02-05,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-02-10,Sales,클라우드_서비스,Cloud_Run,nol-universe-dev,98.5,요청,610000,API 사용량 증가
+2025-02-14,Marketing,마케팅_캠페인,Google_Ads,nol-universe-dev,1500,클릭,10500,발렌타인 데이 프로모션
+2025-02-18,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,112.3,GB,4100,데이터 저장 필요량 증가
+2025-02-20,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,355,세션,28000,챗봇 트래픽 증가
+2025-02-25,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,235,시간,170,프로덕션 백엔드 서버 운영
+2025-03-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,2010.25,슬롯_시간,7500,월간 보고서 생성을 위한 BigQuery 슬롯
+2025-03-03,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-03-08,Sales,클라우드_서비스,Cloud_Run,nol-universe-dev,105.7,요청,650000,영업 대시보드용 API
+2025-03-12,Marketing,마케팅_캠페인,Google_Ads,nol-universe-dev,1800,클릭,12000,1분기 종료 캠페인
+2025-03-15,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,125.8,GB,4800,데이터 아카이브 저장
+2025-03-20,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,380,세션,30000,1분기 챗봇 사용량 피크
+2025-03-25,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,250.2,시간,180,프로덕션 백엔드 서버 운영
+2025-04-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,2150.8,슬롯_시간,7800,2분기 기획 및 보고
+2025-04-05,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-04-08,Sales,출장,항공권,N/A,150,건,1,대구 출장
+2025-04-10,Marketing,마케팅_캠페인,Google_Ads,nol-universe-dev,2100,클릭,15000,봄 프로모션 캠페인
+2025-04-15,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,135.2,GB,5100,새 프로젝트 데이터 저장
+2025-04-20,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,410,세션,32000,2분기 트래픽 증가
+2025-04-25,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,275.5,시간,195,서버 용량 업그레이드
+2025-05-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,2300.6,슬롯_시간,8200,월간 데이터 파이프라인 처리
+2025-05-05,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-05-10,Sales,클라우드_서비스,Cloud_Run,nol-universe-dev,112.5,요청,680000,새 기능 배포
+2025-05-15,Marketing,SaaS,Mailchimp,N/A,55,사용자,2,이메일 마케팅 툴 구독
+2025-05-20,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,142.1,GB,5500,정기 데이터 백업
+2025-05-25,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,430,세션,34000,꾸준한 챗봇 사용
+2025-05-30,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,285.4,시간,205,백엔드 서버 유지보수
+2025-06-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,2450.9,슬롯_시간,8500,2분기 마감 보고
+2025-06-05,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-06-08,Sales,클라우드_서비스,Cloud_Run,nol-universe-dev,120.3,요청,720000,새 영업 툴용 API
+2025-06-12,Marketing,마케팅_캠페인,Google_Ads,nol-universe-dev,2400,클릭,18000,여름 프로모션
+2025-06-15,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,150.9,GB,5800,2분기 데이터 아카이빙
+2025-06-20,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,450,세션,35000,2분기 챗봇 사용량 피크
+2025-06-25,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,300.1,시간,215,2분기 서버 리소스 검토
+2025-07-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,2600.5,슬롯_시간,9000,3분기 기획 및 데이터 분석
+2025-07-05,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-07-08,Sales,출장,항공권,N/A,500,건,2,제주 및 서울 출장
+2025-07-10,Marketing,마케팅_캠페인,Google_Ads,nol-universe-dev,2600,클릭,20000,여름 마케팅 캠페인
+2025-07-15,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,160.4,GB,6200,새 기능 데이터 저장
+2025-07-20,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,470,세션,37000,챗봇 트래픽 증가
+2025-07-25,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,320.6,시간,230,새 프로젝트용 서버 용량
+2025-08-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,2750.8,슬롯_시간,9500,월간 데이터 보고서 생성
+2025-08-05,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-08-10,Sales,클라우드_서비스,Cloud_Run,nol-universe-dev,130.4,요청,750000,새 영업 대시보드 출시
+2025-08-15,Marketing,SaaS,Mailchimp,N/A,55,사용자,2,이메일 마케팅 툴 구독
+2025-08-20,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,170.1,GB,6500,정기 데이터 백업 및 아카이브
+2025-08-25,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,490,세션,38500,챗봇 사용량 증가
+2025-08-30,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,340.5,시간,245,백엔드 서버 업그레이드
+2025-09-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,2900.7,슬롯_시간,10000,3분기 마감 보고
+2025-09-05,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-09-08,Sales,클라우드_서비스,Cloud_Run,nol-universe-dev,140.8,요청,780000,영업팀용 API
+2025-09-12,Marketing,마케팅_캠페인,Google_Ads,nol-universe-dev,2800,클릭,22000,개학 시즌 캠페인
+2025-09-15,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,180.5,GB,6800,3분기 데이터 아카이빙
+2025-09-20,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,510,세션,40000,3분기 챗봇 사용량 피크
+2025-09-25,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,360.2,시간,260,서버 리소스 검토
+2025-10-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,3050.6,슬롯_시간,10500,4분기 기획 및 데이터 분석
+2025-10-05,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-10-08,Sales,출장,항공권,N/A,300,건,1,광주 출장
+2025-10-10,Marketing,마케팅_캠페인,Google_Ads,nol-universe-dev,3000,클릭,25000,홀리데이 시즌 캠페인 시작
+2025-10-15,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,190.7,GB,7200,홀리데이 프로모션용 데이터 저장
+2025-10-20,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,530,세션,42000,챗봇 트래픽 증가
+2025-10-25,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,380.1,시간,275,홀리데이 트래픽용 서버 용량
+2025-11-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,3200.9,슬롯_시간,11000,월간 데이터 파이프라인 처리
+2025-11-05,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-11-10,Sales,클라우드_서비스,Cloud_Run,nol-universe-dev,155.2,요청,810000,홀리데이 판매용 API 김택진 전화번호 010-8723-0993 tkkim@gmail.com
+2025-11-15,Marketing,SaaS,Mailchimp,N/A,55,사용자,2,이메일 마케팅 툴 구독
+2025-11-20,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,205.3,GB,7500,정기 데이터 백업 및 아카이브
+2025-11-25,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,550,세션,44000,홀리데이 챗봇 사용량 피크
+2025-11-30,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,400.5,시간,290,백엔드 서버 홀리데이 대비
+2025-12-01,IT,클라우드_서비스,BigQuery,nol-universe-prod,3450.7,슬롯_시간,12000,연말 보고
+2025-12-05,CS,SaaS,Zendesk,nol-universe-prod,450,사용자,15,고객 지원 소프트웨어 라이선스
+2025-12-08,Sales,클라우드_서비스,Cloud_Run,nol-universe-dev,165.9,요청,850000,연말 판매용 API
+2025-12-12,Marketing,마케팅_캠페인,Google_Ads,nol-universe-dev,3200,클릭,28000,연말 프로모션
+2025-12-15,IT,클라우드_서비스,Cloud_Storage,nol-universe-prod,220.1,GB,7800,연말 데이터 아카이빙
+2025-12-20,CS,클라우드_서비스,Dialogflow_CX,nol-universe-prod,580,세션,46000,연말 챗봇 사용량 피크
+2025-12-25,IT,클라우드_서비스,Compute_Engine,nol-universe-prod,420.3,시간,310,연말 서버 리소스 조정
+2025-12-31,IT,클라우드_서비스,BigQuery,nol-universe-prod,3600.8,슬롯_시간,12500,연말정산 데이터 분석

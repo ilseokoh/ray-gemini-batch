@@ -12,6 +12,7 @@ dependencies = [
     "google-cloud-bigquery-storage>=2.36.2",
     "google-cloud-storage>=3.9.0",
     "google-genai>=1.66.0",
+    "pandas-gbq>=0.34.0",
     "pydantic>=2.12.5",
     "python-dotenv>=1.2.2",
     "ray[data,default]>=2.54.0",

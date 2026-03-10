@@ -127,3 +127,118 @@ petal.width   double
 variety       string
 
 Ray Data relies on PyArrow for authentication with Google Cloud Storage. For more on how to configure your credentials to be compatible with PyArrow, see their [GCS Filesystem docs](https://arrow.apache.org/docs/python/filesystems.html#google-cloud-storage-file-system).
+
+## ray.wait — Ray 2.54.0
+
+ray.wait(*ray\_waitables: [List](https://docs.python.org/3/library/typing.html#typing.List "(in Python v3.14)")\[ray.\_raylet.ObjectRef | ray.\_raylet.ObjectRefGenerator\]*, *\**, *num\_returns: [int](https://docs.python.org/3/library/functions.html#int "(in Python v3.14)") \= 1*, *timeout: [float](https://docs.python.org/3/library/functions.html#float "(in Python v3.14)") | [None](https://docs.python.org/3/library/constants.html#None "(in Python v3.14)") \= None*, *fetch\_local: [bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.14)") \= True*) → [Tuple](https://docs.python.org/3/library/typing.html#typing.Tuple "(in Python v3.14)")\[[List](https://docs.python.org/3/library/typing.html#typing.List "(in Python v3.14)")\[ray.\_raylet.ObjectRef | ray.\_raylet.ObjectRefGenerator\], [List](https://docs.python.org/3/library/typing.html#typing.List "(in Python v3.14)")\[ray.\_raylet.ObjectRef | ray.\_raylet.ObjectRefGenerator\]\][\[source\]](https://docs.ray.io/en/latest/_modules/ray/_private/worker.html#wait)[#](https://docs.ray.io/en/latest/ray-core/api/doc/ray.wait.html#ray.wait "Link to this definition")
+
+Return a list of IDs that are ready and a list of IDs that are not.
+
+If timeout is set, the function returns either when the requested number of IDs are ready or when the timeout is reached, whichever occurs first. If it is not set, the function simply waits until that number of objects is ready and returns that exact number of object refs.
+
+`ray_waitables` is a list of `ObjectRef` and `ObjectRefGenerator`.
+
+The method returns two lists, ready and unready `ray_waitables`.
+
+ObjectRef:
+
+object refs that correspond to objects that are available in the object store are in the first list. The rest of the object refs are in the second list.
+
+ObjectRefGenerator:
+
+Generators whose next reference (that will be obtained via `next(generator)`) has a corresponding object available in the object store are in the first list. All other generators are placed in the second list.
+
+Ordering of the input list of ray\_waitables is preserved. That is, if A precedes B in the input list, and both are in the ready list, then A will precede B in the ready list. This also holds true if A and B are both in the remaining list.
+
+This method will issue a warning if it’s running inside an async context. Instead of `ray.wait(ray_waitables)`, you can use `await asyncio.wait(ray_waitables)`.
+
+Related patterns and anti-patterns:
+
+-   [Pattern: Using ray.wait to limit the number of pending tasks](https://docs.ray.io/en/latest/ray-core/patterns/limit-pending-tasks.html)
+    
+-   [Anti-pattern: Processing results in submission order using ray.get increases runtime](https://docs.ray.io/en/latest/ray-core/patterns/ray-get-submission-order.html)
+    
+
+Parameters:
+
+-   **ray\_waitables** – List of `ObjectRef` or `ObjectRefGenerator` for objects that may or may not be ready. Note that these must be unique.
+    
+-   **num\_returns** – The number of ray\_waitables that should be returned.
+    
+-   **timeout** – The maximum amount of time in seconds to wait before returning.
+    
+-   **fetch\_local** – If True, wait for the object to be downloaded onto the local node before returning it as ready. If the `ray_waitable` is a generator, it will wait until the next object in the generator is downloaed. If False, ray.wait() will not trigger fetching of objects to the local node and will return immediately once the object is available anywhere in the cluster.
+    
+
+Returns:
+
+A list of object refs that are ready and a list of the remaining object IDs.
+
+## # ray.data.Dataset.write_bigquery — Ray 2.54.0
+
+Dataset.write\_bigquery(*project\_id: [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.14)")*, *dataset: [str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.14)")*, *max\_retry\_cnt: [int](https://docs.python.org/3/library/functions.html#int "(in Python v3.14)") \= 10*, *overwrite\_table: [bool](https://docs.python.org/3/library/functions.html#bool "(in Python v3.14)") | [None](https://docs.python.org/3/library/constants.html#None "(in Python v3.14)") \= True*, *ray\_remote\_args: [Dict](https://docs.python.org/3/library/typing.html#typing.Dict "(in Python v3.14)")\[[str](https://docs.python.org/3/library/stdtypes.html#str "(in Python v3.14)"), [Any](https://docs.python.org/3/library/typing.html#typing.Any "(in Python v3.14)")\] | [None](https://docs.python.org/3/library/constants.html#None "(in Python v3.14)") \= None*, *concurrency: [int](https://docs.python.org/3/library/functions.html#int "(in Python v3.14)") | [None](https://docs.python.org/3/library/constants.html#None "(in Python v3.14)") \= None*) → [None](https://docs.python.org/3/library/constants.html#None "(in Python v3.14)")[\[source\]](https://docs.ray.io/en/latest/_modules/ray/data/dataset.html#Dataset.write_bigquery)[#](https://docs.ray.io/en/latest/data/api/doc/ray.data.Dataset.write_bigquery.html#ray.data.Dataset.write_bigquery "Link to this definition")
+
+Write the dataset to a BigQuery dataset table.
+
+To control the number of parallel write tasks, use `.repartition()` before calling this method.
+
+Note
+
+This operation will trigger execution of the lazy transformations performed on this dataset.
+
+Examples
+
+import ray
+import pandas as pd
+
+docs \= \[{"title": "BigQuery Datasource test"} for key in range(4)\]
+ds \= ray.data.from\_pandas(pd.DataFrame(docs))
+ds.write\_bigquery(
+    project\_id\="my\_project\_id",
+    dataset\="my\_dataset\_table",
+    overwrite\_table\=True
+)
+
+Parameters:
+
+-   **project\_id** – The name of the associated Google Cloud Project that hosts the dataset to read. For more information, see details in [Creating and managing projects](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
+    
+-   **dataset** – The name of the dataset in the format of `dataset_id.table_id`. The dataset is created if it doesn’t already exist.
+    
+-   **max\_retry\_cnt** – The maximum number of retries that an individual block write is retried due to BigQuery rate limiting errors. This isn’t related to Ray fault tolerance retries. The default number of retries is 10.
+    
+-   **overwrite\_table** – Whether the write will overwrite the table if it already exists. The default behavior is to overwrite the table. `overwrite_table=False` will append to the table if it exists.
+    
+-   **ray\_remote\_args** – Kwargs passed to [`ray.remote()`](https://docs.ray.io/en/latest/ray-core/api/doc/ray.remote.html#ray.remote "ray.remote") in the write tasks.
+    
+-   **concurrency** – The maximum number of Ray tasks to run concurrently. Set this to control number of tasks to run concurrently. This doesn’t change the total number of tasks run. By default, concurrency is dynamically decided based on the available resources.
+
+## ray.wait example 
+
+```
+from datetime import datetime
+import time
+import random
+import ray
+
+ray.init()
+
+@ray.remote
+def do_some_work(x):
+    time.sleep(random.uniform(0, 4)) # 0 ~ 4초 사이 램덤으로 지연
+    return x
+
+def process_results(sum, result):
+    time.sleep(1)
+    sum += result
+    return sum
+
+start = datetime.now()
+datas = [do_some_work.remote(x) for x in range(10)]
+sum = 0
+while len(datas):
+    done, datas = ray.wait(datas) # 다된 작업은 done으로 넘긴다.
+    sum = process_results(sum, ray.get(done[0]))
+print("duration = ", datetime.now() - start)
+print("results = ", sum)
+```

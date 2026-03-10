@@ -8,12 +8,13 @@ from google import genai
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from google.genai import types
+import pandas as pd
 
 project_id = os.environ.get('PROJECT_ID', 'kevin-ai-playground')
 gemini_location = os.environ.get('GEMINI_LOCATION', 'global')
-gemini_model = os.environ.get('GEMINI_MODEL','gemini-2.5-flash')
-bq_location = os.environ.get('BQ_LOCATION','')
-bq_table = os.environ.get('BQ_TABLE_NAME','')
+gemini_model = os.environ.get('GEMINI_MODEL','gemini-2.5-flash-lite')
+bq_location = os.environ.get('BQ_LOCATION','asia-northeast3')
+bq_table = os.environ.get('BQ_TABLE_NAME','csv_parse_ds.csv_a_result')
 max_retry_cnt = int(os.environ.get('MAX_RETRY_CNT',3))
 
 # --- Initialize Vertex AI ---
@@ -219,7 +220,6 @@ def check_content_type_for_gemini(content_type: str) -> str | None:
             return t
     return None
 
-
 def call_gemini_with_attachment(url: str, type: str) -> List[PIData]:
     """
     Calls the Gemini model with a given file URI and includes retry logic
@@ -274,7 +274,6 @@ def call_gemini_with_attachment(url: str, type: str) -> List[PIData]:
             if not result or not result.strip():
                 result = "[]"
 
-            print(result)
             # Parse the JSON string and create a list of PIData objects
             result_json = json.loads(result)
             return [PIData(**item) for item in result_json]
@@ -294,24 +293,26 @@ def call_gemini_with_attachment(url: str, type: str) -> List[PIData]:
                 print("Max retries reached. Failed to call Gemini API.")
                 raise Exception("max_retry_cnt")
 
-def call_gemini_str(content: str) -> List[PIData]:
+def call_gemini_with_csv(df: pd.DataFrame) -> List[PIData]:
     """
-    Calls the Gemini model with a given string content.
+    Calls the Gemini model with a given pandas DataFrame.
 
     Args:
-        content: The string content to be analyzed.
+        df: The DataFrame to be analyzed.
 
     Returns:
         A list of PIData objects if successful, otherwise an empty list.
     """
-    max_retries = 3
+    content = df.to_string()
+    
+    max_retries = max_retry_cnt
     for attempt in range(max_retries):
         try:
             # Generate content
-            response = client.generate_content(
+            response = client.models.generate_content(
                 model=gemini_model,
                 contents=[f"{prompt}\n\n{content}"], # Combine prompt and content
-                config=GenerateContentConfig(
+                config=types.GenerateContentConfig(
                     system_instruction=system_instruction,
                     response_mime_type="application/json",
                     response_schema=response_schema,
@@ -319,6 +320,7 @@ def call_gemini_str(content: str) -> List[PIData]:
             )
 
             result_text = response.text
+            print(result_text)
 
             if not result_text or not result_text.strip():
                 return []
@@ -328,7 +330,7 @@ def call_gemini_str(content: str) -> List[PIData]:
             return [PIData(**item) for item in result_json]
 
         except Exception as e:
-            print(f"Error on attempt {attempt + 1} in call_gemini_str: {e}")
+            print(f"Error on attempt {attempt + 1} in call_gemini_with_csv: {e}")
             if attempt < max_retries - 1:
                 # Exponential backoff: 2^attempt + random seconds
                 wait_time = (2 ** attempt) + random.uniform(0, 1)
