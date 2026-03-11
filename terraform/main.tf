@@ -163,10 +163,10 @@ module "kuberay-monitoring" {
 
 module "gcs" {
   source      = "github.com/ai-on-gke/common-infra/common/modules/gcs"
-  count       = false
+  count       = var.create_gcs_bucket ? 1 : 0
   project_id  = var.project_id
   bucket_name = var.gcs_bucket
-  region      = "asia-northeast3"
+  region      = var.cluster_location
 }
 
 module "kuberay-cluster" {

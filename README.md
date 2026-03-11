@@ -50,19 +50,49 @@ terraform apply --var-file=workloads.tfvars
 
 GKE 상태 확인 
 ```
+gcloud container clusters get-credentials ray-enabled-gke --location=asia-northeast3
 kubectl get nodes
-
+kubectl get pods
+kubectl get raycluster 
+kubectl describe raycluster ray-cluster-kuberay
 ```
 
 
+kubectl ray session 명령으로 localhost 에서 연결가능 하도록 해준다. 
+이 명령을 위해서는 [Install the KubeRay kubectl ray plugin](https://docs.cloud.google.com/kubernetes-engine/docs/add-on/ray-on-gke/quickstarts/ray-gpu-cluster#install-plugin)를 참조하여 설치해준다. 또는 [Use kubectl plugin](https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/kubectl-plugin.html#use-kubectl-plugin-beta)
 ```bash
-gcloud container clusters get-credentials my-ray-enabled-cluster --location=us-central1
-kubectl ray session my-ray-cluster
+kubectl ray session ray-cluster-kuberay 
+
+Forwarding ports to service ray-cluster-kuberay-head-svc
+Ray Dashboard: http://localhost:8265
+Ray Interactive Client: http://localhost:10001
+
+Forwarding from 127.0.0.1:8265 -> 8265
+Forwarding from 127.0.0.1:10001 -> 10001
 ```
 
+새로운 터미널을 열고, Application이 실행되는지 Bucket에 파일을 쓰면서 테스트 한다. 
+bucket-test.py 에서 테스트용 Bucket 을 하나 지정한다. (GCP_GCS_BUCKET = "<your test bucket>")
 ```
-source .venv/bin/activate
-ray job submit --address http://localhost:8265 --runtime-env=env.yaml -- python gemini-job.py
+cd app
+uv sync
+uv run ray job submit --address http://localhost:8265 --runtime-env=env.yaml -- python bucket-test.py
+
+Job submission server address: http://localhost:8265
+
+-------------------------------------------------------
+Job 'raysubmit_zhUZt5imBh2Zm2sR' submitted successfully
+-------------------------------------------------------
+
+Next steps
+  Query the logs of the job:
+    ray job logs raysubmit_zhUZt5imBh2Zm2sR
+  Query the status of the job:
+    ray job status raysubmit_zhUZt5imBh2Zm2sR
+  Request the job to be stopped:
+    ray job stop raysubmit_zhUZt5imBh2Zm2sR
+
+Tailing logs until the job exits (disable with --no-wait):
 ```
 
 

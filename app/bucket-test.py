@@ -2,7 +2,7 @@ import ray
 import os
 from google.cloud import storage
 
-GCP_GCS_BUCKET = "g80-manual-001"
+GCP_GCS_BUCKET = "<your test bucket>"
 GCP_GCS_FILE = "test_file.txt"
 
 ray.init(address="auto")

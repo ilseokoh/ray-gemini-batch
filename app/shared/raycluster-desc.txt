@@ -1,0 +1,239 @@
+Name:         ray-cluster-kuberay
+Namespace:    default
+Labels:       app.kubernetes.io/instance=ray-cluster
+              app.kubernetes.io/managed-by=Helm
+              app.kubernetes.io/name=kuberay
+              helm.sh/chart=ray-cluster-1.0.0
+Annotations:  meta.helm.sh/release-name: ray-cluster
+              meta.helm.sh/release-namespace: default
+API Version:  ray.io/v1
+Kind:         RayCluster
+Metadata:
+  Creation Timestamp:  2026-03-08T07:43:15Z
+  Generation:          27
+  Resource Version:    1773142681508415001
+  UID:                 6b74f551-35b0-4e75-83b8-df24578a8041
+Spec:
+  Enable In Tree Autoscaling:  true
+  Head Group Spec:
+    Ray Start Params:
+      Block:             true
+      Dashboard - Host:  0.0.0.0
+    Service Type:        ClusterIP
+    Template:
+      Metadata:
+        Annotations:
+          gke-gcsfuse/cpu-limit:                1
+          gke-gcsfuse/ephemeral-storage-limit:  300Gi
+          gke-gcsfuse/memory-limit:             2Gi
+          gke-gcsfuse/volumes:                  true
+        Labels:
+          ai.gke.io:                           ray
+          app.kubernetes.io/instance:          ray-cluster
+          app.kubernetes.io/managed-by:        Helm
+          app.kubernetes.io/name:              kuberay
+          cloud.google.com/gke-ray-node-type:  head
+          Created - By:                        ai-on-gke
+          helm.sh/chart:                       ray-cluster-1.0.0
+      Spec:
+        Affinity:
+        Containers:
+          Env:
+            Name:             RAY_memory_monitor_refresh_ms
+            Value:            0
+            Name:             RAY_GRAFANA_IFRAME_HOST
+            Value:            http://
+            Name:             RAY_GRAFANA_HOST
+            Value:            http://grafana:80
+            Name:             RAY_PROMETHEUS_HOST
+            Value:            http://frontend:9090
+            Name:             CLOUDSQL_INSTANCE_CONNECTION_NAME
+            Value:            kevin-ai-playground:us-central1:pgvector-instance
+          Image:              rayproject/ray:2.44.1-py312
+          Image Pull Policy:  IfNotPresent
+          Name:               ray-head
+          Resources:
+            Limits:
+              Cpu:                  4
+              Ephemeral - Storage:  3Gi
+              Memory:               8G
+            Requests:
+              Cpu:                  4
+              Ephemeral - Storage:  3Gi
+              Memory:               8G
+          Security Context:
+            Allow Privilege Escalation:  false
+            Capabilities:
+              Drop:
+                ALL
+            Privileged:       false
+            Run As Non Root:  true
+            Seccomp Profile:
+              Type:  RuntimeDefault
+          Volume Mounts:
+            Mount Path:  /data
+            Name:        gcs-fuse-csi-ephemeral
+            Mount Path:  /etc/secret-volume
+            Name:        secret-volume
+            Read Only:   true
+        Image Pull Secrets:
+        Node Selector:
+          iam.gke.io/gke-metadata-server-enabled:  true
+        Service Account Name:                      ray-sa
+        Tolerations:
+        Volumes:
+          Csi:
+            Driver:  gcsfuse.csi.storage.gke.io
+            Volume Attributes:
+              Bucket Name:    ray-bucket-zydg1
+              Mount Options:  implicit-dirs,uid=1000,gid=100
+          Name:               gcs-fuse-csi-ephemeral
+          Name:               secret-volume
+          Secret:
+            Optional:     true
+            Secret Name:  empty-secret
+  Worker Group Specs:
+    Group Name:    workerGroup
+    Max Replicas:  10
+    Min Replicas:  1
+    Num Of Hosts:  1
+    Ray Start Params:
+      Block:   true
+    Replicas:  1
+    Template:
+      Metadata:
+        Annotations:
+          gke-gcsfuse/cpu-limit:                2
+          gke-gcsfuse/ephemeral-storage-limit:  2000Gi
+          gke-gcsfuse/memory-limit:             8Gi
+          gke-gcsfuse/volumes:                  true
+        Labels:
+          ai.gke.io:                           ray
+          app.kubernetes.io/instance:          ray-cluster
+          app.kubernetes.io/managed-by:        Helm
+          app.kubernetes.io/name:              kuberay
+          cloud.google.com/gke-ray-node-type:  worker
+          Created - By:                        ai-on-gke
+          helm.sh/chart:                       ray-cluster-1.0.0
+      Spec:
+        Affinity:
+        Containers:
+          Env:
+            Name:             CLOUDSQL_INSTANCE_CONNECTION_NAME
+            Value:            kevin-ai-playground:us-central1:pgvector-instance
+          Image:              rayproject/ray:2.44.1-py312
+          Image Pull Policy:  IfNotPresent
+          Name:               ray-worker
+          Resources:
+            Limits:
+              Cpu:                  4
+              Ephemeral - Storage:  20Gi
+              Memory:               8G
+            Requests:
+              Cpu:                  4
+              Ephemeral - Storage:  20Gi
+              Memory:               8G
+          Security Context:
+            Allow Privilege Escalation:  false
+            Capabilities:
+              Drop:
+                ALL
+            Privileged:       false
+            Run As Non Root:  true
+            Seccomp Profile:
+              Type:  RuntimeDefault
+          Volume Mounts:
+            Mount Path:  /data
+            Name:        gcs-fuse-csi-ephemeral
+            Mount Path:  /etc/secret-volume
+            Name:        secret-volume
+            Read Only:   true
+        Image Pull Secrets:
+        Node Selector:
+          iam.gke.io/gke-metadata-server-enabled:  true
+        Service Account Name:                      ray-sa
+        Tolerations:
+        Volumes:
+          Csi:
+            Driver:  gcsfuse.csi.storage.gke.io
+            Volume Attributes:
+              Bucket Name:    ray-bucket-zydg1
+              Mount Options:  implicit-dirs,uid=1000,gid=100
+          Name:               gcs-fuse-csi-ephemeral
+          Name:               secret-volume
+          Secret:
+            Optional:     true
+            Secret Name:  empty-secret
+Status:
+  Conditions:
+    Last Transition Time:  2026-03-08T07:46:05Z
+    Message:               
+    Reason:                HeadPodRunningAndReady
+    Status:                True
+    Type:                  HeadPodReady
+    Last Transition Time:  2026-03-08T07:46:05Z
+    Message:               All Ray Pods are ready for the first time
+    Reason:                AllPodRunningAndReadyFirstTime
+    Status:                True
+    Type:                  RayClusterProvisioned
+    Last Transition Time:  2026-03-08T07:43:16Z
+    Message:               
+    Reason:                RayClusterSuspended
+    Status:                False
+    Type:                  RayClusterSuspended
+    Last Transition Time:  2026-03-08T07:43:16Z
+    Message:               
+    Reason:                RayClusterSuspending
+    Status:                False
+    Type:                  RayClusterSuspending
+    Last Transition Time:  2026-03-10T06:04:27Z
+    Message:               FailedCreateWorkerPod
+admission webhook "warden-validating.common-webhooks.networking.gke.io" denied the request: GKE Warden rejected the request because it violates one or more constraints.
+Violations details: {"[denied by autogke-pod-limit-constraints]":["Total ephemeral-storage requested by containers for workload 'ray-cluster-kuberay-workergroup-worker-n4qw6' is higher than the Autopilot maximum of '10Gi'."]}
+PodSpec Resources: {"InitContainers":[{"Name":"gke-gcsfuse-sidecar","Resources":{"limits":{"cpu":"2","ephemeral-storage":"2000Gi","memory":"8Gi"},"requests":{"cpu":"2","ephemeral-storage":"2000Gi","memory":"8Gi"}}}],"Containers":[{"Name":"ray-worker","Resources":{"limits":{"cpu":"4","ephemeral-storage":"20Gi","memory":"8G"},"requests":{"cpu":"4","ephemeral-storage":"20Gi","memory":"8G"}}},{"Name":"fluentbit","Resources":{"limits":{"ephemeral-storage":"1Gi","memory":"250Mi"},"requests":{"cpu":"50m","ephemeral-storage":"1Gi","memory":"100Mi"}}}]}
+Requested by user: 'system:kuberay-operator', groups: 'system:gke-components-common,system:authenticated'.
+    Reason:                 FailedCreateWorkerPod
+    Status:                 True
+    Type:                   ReplicaFailure
+  Desired CPU:              8
+  Desired GPU:              0
+  Desired Memory:           16G
+  Desired TPU:              0
+  Desired Worker Replicas:  1
+  Endpoints:
+    Client:        10001
+    Dashboard:     8265
+    Gcs - Server:  6379
+    Metrics:       8080
+    Serve:         8000
+  Head:
+    Pod IP:             10.61.0.19
+    Pod Name:           ray-cluster-kuberay-head-hcc6r
+    Service IP:         10.61.0.19
+    Service Name:       ray-cluster-kuberay-head-svc
+  Last Update Time:     2026-03-10T11:38:01Z
+  Max Worker Replicas:  10
+  Min Worker Replicas:  1
+  Observed Generation:  27
+  State:                ready
+  State Transition Times:
+    Ready:  2026-03-08T07:46:05Z
+Events:
+  Type     Reason                   Age   From                   Message
+  ----     ------                   ----  ----                   -------
+  Warning  FailedToCreateWorkerPod  51m   raycluster-controller  Failed to create worker Pod for the cluster default/ray-cluster-kuberay, admission webhook "warden-validating.common-webhooks.networking.gke.io" denied the request: GKE Warden rejected the request because it violates one or more constraints.
+Violations details: {"[denied by autogke-pod-limit-constraints]":["Total ephemeral-storage requested by containers for workload 'ray-cluster-kuberay-workergroup-worker-rknzn' is higher than the Autopilot maximum of '10Gi'."]}
+PodSpec Resources: {"InitContainers":[{"Name":"gke-gcsfuse-sidecar","Resources":{"limits":{"cpu":"2","ephemeral-storage":"2000Gi","memory":"8Gi"},"requests":{"cpu":"2","ephemeral-storage":"2000Gi","memory":"8Gi"}}}],"Containers":[{"Name":"ray-worker","Resources":{"limits":{"cpu":"4","ephemeral-storage":"20Gi","memory":"8G"},"requests":{"cpu":"4","ephemeral-storage":"20Gi","memory":"8G"}}},{"Name":"fluentbit","Resources":{"limits":{"ephemeral-storage":"1Gi","memory":"250Mi"},"requests":{"cpu":"50m","ephemeral-storage":"1Gi","memory":"100Mi"}}}]}
+Requested by user: 'system:kuberay-operator', groups: 'system:gke-components-common,system:authenticated'.
+  Warning  FailedToCreateWorkerPod  34m  raycluster-controller  Failed to create worker Pod for the cluster default/ray-cluster-kuberay, admission webhook "warden-validating.common-webhooks.networking.gke.io" denied the request: GKE Warden rejected the request because it violates one or more constraints.
+Violations details: {"[denied by autogke-pod-limit-constraints]":["Total ephemeral-storage requested by containers for workload 'ray-cluster-kuberay-workergroup-worker-pvhhw' is higher than the Autopilot maximum of '10Gi'."]}
+PodSpec Resources: {"InitContainers":[{"Name":"gke-gcsfuse-sidecar","Resources":{"limits":{"cpu":"2","ephemeral-storage":"2000Gi","memory":"8Gi"},"requests":{"cpu":"2","ephemeral-storage":"2000Gi","memory":"8Gi"}}}],"Containers":[{"Name":"ray-worker","Resources":{"limits":{"cpu":"4","ephemeral-storage":"20Gi","memory":"8G"},"requests":{"cpu":"4","ephemeral-storage":"20Gi","memory":"8G"}}},{"Name":"fluentbit","Resources":{"limits":{"ephemeral-storage":"1Gi","memory":"250Mi"},"requests":{"cpu":"50m","ephemeral-storage":"1Gi","memory":"100Mi"}}}]}
+Requested by user: 'system:kuberay-operator', groups: 'system:gke-components-common,system:authenticated'.
+  Warning  FailedToCreateWorkerPod  18m  raycluster-controller  Failed to create worker Pod for the cluster default/ray-cluster-kuberay, admission webhook "warden-validating.common-webhooks.networking.gke.io" denied the request: GKE Warden rejected the request because it violates one or more constraints.
+Violations details: {"[denied by autogke-pod-limit-constraints]":["Total ephemeral-storage requested by containers for workload 'ray-cluster-kuberay-workergroup-worker-mxmx4' is higher than the Autopilot maximum of '10Gi'."]}
+PodSpec Resources: {"InitContainers":[{"Name":"gke-gcsfuse-sidecar","Resources":{"limits":{"cpu":"2","ephemeral-storage":"2000Gi","memory":"8Gi"},"requests":{"cpu":"2","ephemeral-storage":"2000Gi","memory":"8Gi"}}}],"Containers":[{"Name":"ray-worker","Resources":{"limits":{"cpu":"4","ephemeral-storage":"20Gi","memory":"8G"},"requests":{"cpu":"4","ephemeral-storage":"20Gi","memory":"8G"}}},{"Name":"fluentbit","Resources":{"limits":{"ephemeral-storage":"1Gi","memory":"250Mi"},"requests":{"cpu":"50m","ephemeral-storage":"1Gi","memory":"100Mi"}}}]}
+Requested by user: 'system:kuberay-operator', groups: 'system:gke-components-common,system:authenticated'.
+  Warning  FailedToCreateWorkerPod  93s  raycluster-controller  Failed to create worker Pod for the cluster default/ray-cluster-kuberay, admission webhook "warden-validating.common-webhooks.networking.gke.io" denied the request: GKE Warden rejected the request because it violates one or more constraints.
+Violations details: {"[denied by autogke-pod-limit-constraints]":["Total ephemeral-storage requested by containers for workload 'ray-cluster-kuberay-workergroup-worker-n4qw6' is higher than the Autopilot maximum of '10Gi'."]}
+PodSpec Resources: {"InitContainers":[{"Name":"gke-gcsfuse-sidecar","Resources":{"limits":{"cpu":"2","ephemeral-storage":"2000Gi","memory":"8Gi"},"requests":{"cpu":"2","ephemeral-storage":"2000Gi","memory":"8Gi"}}}],"Containers":[{"Name":"ray-worker","Resources":{"limits":{"cpu":"4","ephemeral-storage":"20Gi","memory":"8G"},"requests":{"cpu":"4","ephemeral-storage":"20Gi","memory":"8G"}}},{"Name":"fluentbit","Resources":{"limits":{"ephemeral-storage":"1Gi","memory":"250Mi"},"requests":{"cpu":"50m","ephemeral-storage":"1Gi","memory":"100Mi"}}}]}
+Requested by user: 'system:kuberay-operator', groups: 'system:gke-components-common,system:authenticated'.
