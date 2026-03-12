@@ -115,9 +115,9 @@ if processed_batches:
             project_id=project_id,
             dataset=f"{bq_table}_batch" ,
             overwrite_table=True,, # Whether the write will overwrite the table if it already exists. 
-            cuncurrency=2,  # The maximum number of Ray tasks to run concurrently. Set this to control number of tasks to run concurrently. This doesn’t change the total number of tasks run. 
+            concurrency=2,  # The maximum number of Ray tasks to run concurrently. Set this to control number of tasks to run concurrently. This doesn’t change the total number of tasks run. 
         )                   # TooManyRequests: 429 Exceeded rate limits: too many table update operations for this table.
-        print(f"Successfully saved data to BigQuery table: {bq_table}")
+        print(f"Successfully saved data to BigQuery table:ßbq_table}")
     else:
         print("BQ_TABLE_NAME environment variable not set. Skipping saving to BigQuery.")
     
