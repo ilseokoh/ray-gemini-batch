@@ -10,11 +10,11 @@ from typing import Optional, List
 from google.genai import types
 import pandas as pd
 
-project_id = os.environ.get('PROJECT_ID', 'kevin-ai-playground')
+project_id = os.environ.get('PROJECT_ID', '')
 gemini_location = os.environ.get('GEMINI_LOCATION', 'global')
 gemini_model = os.environ.get('GEMINI_MODEL','gemini-2.5-flash-lite')
 bq_location = os.environ.get('BQ_LOCATION','asia-northeast3')
-bq_table = os.environ.get('BQ_TABLE_NAME','csv_parse_ds.csv_a_result')
+bq_table = os.environ.get('BQ_TABLE_NAME','')
 max_retry_cnt = int(os.environ.get('MAX_RETRY_CNT',3))
 
 # --- Initialize Vertex AI ---

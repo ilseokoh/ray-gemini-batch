@@ -57,6 +57,7 @@ kubectl get raycluster
 kubectl describe raycluster ray-cluster-kuberay
 ```
 
+### Ray App 테스트
 
 kubectl ray session 명령으로 localhost 에서 연결가능 하도록 해준다. 
 이 명령을 위해서는 [Install the KubeRay kubectl ray plugin](https://docs.cloud.google.com/kubernetes-engine/docs/add-on/ray-on-gke/quickstarts/ray-gpu-cluster#install-plugin)를 참조하여 설치해준다. 또는 [Use kubectl plugin](https://docs.ray.io/en/latest/cluster/kubernetes/user-guides/kubectl-plugin.html#use-kubectl-plugin-beta)
@@ -95,9 +96,16 @@ Next steps
 Tailing logs until the job exits (disable with --no-wait):
 ```
 
+### monitoring 
 
-# ray-batch-gemini-inference
-Gemini Batch/Parallel Processing with Ray
+kubectl ray session ray-cluster-kuberay 을 실행하면 Dashboard URL 을 알 수 있다. [http://localhost:8265](http://localhost:8265) 로 접속. 
+
+
+
+### main_job.py 실행 
+
+
+-----------
 
 ## Process 
 

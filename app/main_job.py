@@ -1,7 +1,5 @@
 import ray
 import os
-import ray
-import os
 import pandas as pd
 from gemini import call_gemini_with_attachment, call_gemini_with_csv, PIData
 from google.cloud import storage
@@ -10,13 +8,13 @@ import json
 
 ray.init()
 
-project_id = os.environ.get('PROJECT_ID', 'kevin-ai-playground')
+project_id = os.environ.get('PROJECT_ID', '')
 bq_table = os.environ.get('BQ_TABLE_NAME')
 
 # Read target file list from a SQL query of the dataset.
 ds = ray.data.read_bigquery(
-    project_id="kevin-ai-playground",
-    query = "SELECT * FROM `csv_parse_ds.csv_analysis_src_files`",
+    project_id=project_id,
+    query = "SELECT * FROM `<dataset>.<table>`",
 )
 
 print(f"--------------- File Count: {ds.count()}")
@@ -94,7 +92,9 @@ while futures:
         ready_df['result'] = ready_df['result'].apply(
             lambda x: json.dumps([i.model_dump() for i in x], ensure_ascii=False) if isinstance(x, list) else x
         )
-        ready_df.to_gbq(destination_table=bq_table, project_id=project_id, if_exists='append')
+        pandas_gbq.to_gbq(ready_df, bq_table, project_id=project_id, if_exists='append')
+        
+        #ready_df.to_gbq(destination_table=bq_table, project_id=project_id, if_exists='append') # deprecated
     futures = not_ready
 
 # Create a new dataset from the processed batches
