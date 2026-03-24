@@ -2,6 +2,7 @@ import ray
 import os
 from google.cloud import storage
 
+
 GCP_GCS_BUCKET = ""
 GCP_GCS_FILE = "test_file.txt"
 

@@ -6,7 +6,7 @@ ray.init()
 
 # Read target file list from a SQL query of the dataset.
 ds = ray.data.read_bigquery(
-    project_id="pjt-lges-midata",
+    project_id="<your project id>",
     query = "SELECT * FROM `csv_parse_ds.csv_analysis_src_files` WHERE size > 10000 LIMIT 5",
 )
 

@@ -164,8 +164,6 @@ module "kuberay-monitoring" {
   depends_on                      = [module.kuberay-workload-identity]
 }
 
-
-
 module "kuberay-cluster" {
   count                     = var.create_ray_cluster == true ? 1 : 0
   source                    = "github.com/ai-on-gke/common-infra/common/modules/kuberay-cluster"

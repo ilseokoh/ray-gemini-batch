@@ -1,5 +1,10 @@
 import ray
 import os
+import pandas as pd
+from gemini import call_gemini_with_attachment, call_gemini_with_csv, PIData
+from google.cloud import storage
+from typing import List
+
 import json
 import time
 import tempfile
@@ -19,13 +24,13 @@ base_delay = 3  # 처음 대기할 시간 (초)
 
 ray.init()
 
-project_id = os.environ.get('PROJECT_ID', 'pjt-lges-midata')
+project_id = os.environ.get('PROJECT_ID', '')
 bq_table = os.environ.get('BQ_TABLE_NAME')
 bq_backup_table = os.environ.get('BQ_BACKUP_TABLE')
 
 # Read target file list from a SQL query of the dataset.
 ds = ray.data.read_bigquery(
-    project_id="pjt-lges-midata",
+    project_id=project_id,
     query = f"""
     SELECT
         *
@@ -298,8 +303,23 @@ def processing_analysis(batch: pd.DataFrame) -> pd.DataFrame:
 
 batches = [create_batch_job.remote(batch) for batch in ds.iter_batches(batch_size=1000, batch_format="pandas")]
 
-# Wait for all batch jobs to complete
-ray.get(batches)
+# Get the results
+processed_batches = []
+while futures:
+    ready, not_ready = ray.wait(futures)
+    ready_batches = ray.get(ready)
+    processed_batches.extend(ready_batches)
+    # progressive save the data to BQ table
+    if ready_batches:
+        ready_df = pd.concat(ready_batches)
+        ready_df['result'] = ready_df['result'].apply(
+            lambda x: json.dumps([i.model_dump() for i in x], ensure_ascii=False) if isinstance(x, list) else x
+        )
+        pandas_gbq.to_gbq(ready_df, bq_table, project_id=project_id, if_exists='append')
+        
+        #ready_df.to_gbq(destination_table=bq_table, project_id=project_id, if_exists='append') # deprecated
+    futures = not_ready
+
 
 print("All batch jobs completed.")
 

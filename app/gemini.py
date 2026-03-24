@@ -10,12 +10,13 @@ from typing import Optional, List
 from google.genai import types
 import pandas as pd
 
-project_id = os.environ.get('PROJECT_ID', 'pjt-lges-midata')
+project_id = os.environ.get('PROJECT_ID', '')
 gemini_location = os.environ.get('GEMINI_LOCATION', 'global')
 gemini_model = os.environ.get('GEMINI_MODEL','gemini-2.5-flash')
 bq_location = os.environ.get('BQ_LOCATION','asia-northeast3')
-bq_table = os.environ.get('BQ_TABLE_NAME','csv_parse_ds.blue_work2_csv_a_result')
-max_retry_cnt = int(os.environ.get('MAX_RETRY_CNT',5))
+bq_table = os.environ.get('BQ_TABLE_NAME','')
+max_retry_cnt = int(os.environ.get('MAX_RETRY_CNT',3))
+
 
 # --- Initialize Vertex AI ---
 client = genai.Client(vertexai=True, project=project_id, location=gemini_location)
