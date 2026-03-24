@@ -10,12 +10,12 @@ from typing import Optional, List
 from google.genai import types
 import pandas as pd
 
-project_id = os.environ.get('PROJECT_ID', 'kevin-ai-playground')
+project_id = os.environ.get('PROJECT_ID', 'pjt-lges-midata')
 gemini_location = os.environ.get('GEMINI_LOCATION', 'global')
-gemini_model = os.environ.get('GEMINI_MODEL','gemini-2.5-flash-lite')
+gemini_model = os.environ.get('GEMINI_MODEL','gemini-2.5-flash')
 bq_location = os.environ.get('BQ_LOCATION','asia-northeast3')
-bq_table = os.environ.get('BQ_TABLE_NAME','csv_parse_ds.csv_a_result')
-max_retry_cnt = int(os.environ.get('MAX_RETRY_CNT',3))
+bq_table = os.environ.get('BQ_TABLE_NAME','csv_parse_ds.blue_work2_csv_a_result')
+max_retry_cnt = int(os.environ.get('MAX_RETRY_CNT',5))
 
 # --- Initialize Vertex AI ---
 client = genai.Client(vertexai=True, project=project_id, location=gemini_location)
@@ -48,6 +48,9 @@ If the name is separately written in the document or image as given/first name a
 If the personal information is given in a table format, considering the structure of the table, extract and match the information correctly.
 And determine if the given document is `medical records (의료 기록)` or `family relationship certificates (가족관계증명서)` or `identification information (passport, driving license, 여권 등)` or `salary information (급여정보)`.
 Check the file name.
+
+If a passport contains a field labeled "Personal No." or "Personal ID No.", treat it as social_security_number (주민등록번호). For Korean passports, combine the birthday (6 digits, YYMMDD) with the Personal No. using a hyphen to form the full 주민등록번호 format (e.g., "YYMMDD-NNNNNNN").
+If a single page contains personal information of multiple individuals, extract all of them without omission.
 
 The results are output in the following json format, which is a **list of objects (dictionaries)**, allowing for the extraction of information for **multiple individuals**.
 If there is no personal information in the given document or image, output should be an **empty list** (`[]`)
@@ -253,7 +256,7 @@ def call_gemini_with_attachment(url: str, type: str) -> List[PIData]:
         else:
             convert_gcs_encoding_to_utf8_cwd(url, encoding.lower())
 
-    print(f"-------Processing request for URL: {url}, type: {type}, encoding: {encoding}")
+    print(f"-------Processing request for URL: {url},type: {type}, encoding: {encoding}")
 
     csv_file = types.Part.from_uri(file_uri=url, mime_type=checked_type)
     
@@ -274,15 +277,69 @@ def call_gemini_with_attachment(url: str, type: str) -> List[PIData]:
             if not result or not result.strip():
                 result = "[]"
 
-            # Parse the JSON string and create a list of PIData objects
-            result_json = json.loads(result)
-            return [PIData(**item) for item in result_json]
+            return result
+            # # Parse the JSON string and create a list of PIData objects
+            # result_json = json.loads(result)
+            # return [PIData(**item) for item in result_json]
         except Exception as e:
             print(f"Error on attempt {attempt + 1}: {e}")
 
             error_str = str(e)
             if "400" in error_str and "INVALID_ARGUMENT" in error_str:
-                attempt = max_retries
+                print(f"(Att) Error: INVALID_ARGUMENT {e.message} {url}")
+                raise Exception(e.message)
+
+            if attempt < max_retries - 1:
+                # Exponential backoff: 2^attempt + random seconds
+                wait_time = (2 ** attempt) + random.uniform(0, 1)
+                print(f"(Att) Retrying in {wait_time:.2f} seconds...")
+                time.sleep(wait_time)
+            else:
+                print("(Att) Max retries reached. Failed to call Gemini API.")
+                raise Exception("max_retry_cnt")
+
+def call_gemini_with_txt(txt: str) -> List[PIData]:
+    """
+    Calls the Gemini model with a given string.
+
+    Args:
+        txt: The string to be analyzed.
+
+    Returns:
+        A list of PIData objects if successful, otherwise an empty list.
+    """
+    content = txt
+    
+    max_retries = max_retry_cnt
+    for attempt in range(max_retries):
+        try:
+            # Generate content
+            response = client.models.generate_content(
+                model=gemini_model,
+                contents=[f"{prompt}\n\n{content}"], # Combine prompt and content
+                config=types.GenerateContentConfig(
+                    system_instruction=system_instruction,
+                    response_mime_type="application/json",
+                    response_schema=response_schema,
+                ),
+            )
+
+            result_text = response.text
+
+            if not result_text or not result_text.strip():
+                return []
+
+            # Parse the JSON string and create a list of PIData objects
+            result_json = json.loads(result_text)
+            return [PIData(**item) for item in result_json]
+
+        except Exception as e:
+            print(f"(Text) Error on attempt {attempt + 1} in call_gemini_with_txt: {e}")
+
+            error_str = str(e)
+            if "400" in error_str and "INVALID_ARGUMENT" in error_str:
+                print(f"(Text) Error: INVALID_ARGUMENT {e.message}")
+                return []
 
             if attempt < max_retries - 1:
                 # Exponential backoff: 2^attempt + random seconds
@@ -290,8 +347,8 @@ def call_gemini_with_attachment(url: str, type: str) -> List[PIData]:
                 print(f"Retrying in {wait_time:.2f} seconds...")
                 time.sleep(wait_time)
             else:
-                print("Max retries reached. Failed to call Gemini API.")
-                raise Exception("max_retry_cnt")
+                print("(Text) Max retries reached. Failed to call Gemini API with string content.")
+                return [] # Return empty list after all retries fail
 
 def call_gemini_with_csv(df: pd.DataFrame) -> List[PIData]:
     """
@@ -320,7 +377,6 @@ def call_gemini_with_csv(df: pd.DataFrame) -> List[PIData]:
             )
 
             result_text = response.text
-            print(result_text)
 
             if not result_text or not result_text.strip():
                 return []
@@ -330,12 +386,17 @@ def call_gemini_with_csv(df: pd.DataFrame) -> List[PIData]:
             return [PIData(**item) for item in result_json]
 
         except Exception as e:
-            print(f"Error on attempt {attempt + 1} in call_gemini_with_csv: {e}")
+            print(f"(CSV) Error on attempt {attempt + 1} in call_gemini_with_csv: {e}")
+
+            error_str = str(e)
+            if "400" in error_str and "INVALID_ARGUMENT" in error_str:
+                return []
+
             if attempt < max_retries - 1:
                 # Exponential backoff: 2^attempt + random seconds
                 wait_time = (2 ** attempt) + random.uniform(0, 1)
-                print(f"Retrying in {wait_time:.2f} seconds...")
+                print(f"(CSV) Retrying in {wait_time:.2f} seconds...")
                 time.sleep(wait_time)
             else:
-                print("Max retries reached. Failed to call Gemini API with string content.")
+                print("(CSV) Max retries reached. Failed to call Gemini API with string content.")
                 return [] # Return empty list after all retries fail

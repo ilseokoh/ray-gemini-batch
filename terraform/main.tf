@@ -68,13 +68,16 @@ module "infra" {
   autopilot_cluster = var.autopilot_cluster
   private_cluster   = var.private_cluster
   create_network    = false
-  network_name      = "default"
-  subnetwork_name   = "default"
+  network_name      = ""
+  subnetwork_name   = ""
   cpu_pools         = var.cpu_pools
   enable_gpu        = var.enable_gpu
   gpu_pools         = var.gpu_pools
   ray_addon_enabled = true
   depends_on        = [module.project-services]
+  region            = var.cluster_location
+  subnetwork_region = var.cluster_location
+  kubernetes_version = 1.32
 }
 
 data "google_container_cluster" "default" {
@@ -161,13 +164,7 @@ module "kuberay-monitoring" {
   depends_on                      = [module.kuberay-workload-identity]
 }
 
-module "gcs" {
-  source      = "github.com/ai-on-gke/common-infra/common/modules/gcs"
-  count       = false
-  project_id  = var.project_id
-  bucket_name = var.gcs_bucket
-  region      = "asia-northeast3"
-}
+
 
 module "kuberay-cluster" {
   count                     = var.create_ray_cluster == true ? 1 : 0
@@ -185,6 +182,8 @@ module "kuberay-cluster" {
   network_policy_allow_cidr = var.kuberay_network_policy_allow_cidr
   disable_network_policy    = var.disable_ray_cluster_network_policy
   additional_labels         = var.additional_labels
+  db_region                 = var.cluster_location
+
 
   # IAP Auth parameters
   add_auth                 = var.ray_dashboard_add_auth
@@ -199,7 +198,7 @@ module "kuberay-cluster" {
   k8s_backend_service_port = var.ray_dashboard_k8s_backend_service_port
   domain                   = var.ray_dashboard_domain
   members_allowlist        = var.ray_dashboard_members_allowlist != "" ? split(",", var.ray_dashboard_members_allowlist) : []
-  depends_on               = [module.gcs, module.kuberay-workload-identity]
+  depends_on               = [module.kuberay-workload-identity]
 }
 
 

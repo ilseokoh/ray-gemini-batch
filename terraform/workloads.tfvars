@@ -1,5 +1,5 @@
 ##common variables
-project_id = "<your project id>"
+project_id = ""
 
 ## This is required for terraform to connect to GKE cluster and deploy workloads.
 cluster_name     = "ray-enabled-gke"
@@ -24,8 +24,8 @@ create_service_account            = true
 workload_identity_service_account = "ray-sa"
 
 # Bucket name should be globally unique.
-create_gcs_bucket               = true
-gcs_bucket                      = "ray-bucket-zydg1"
+create_gcs_bucket               = false
+gcs_bucket                      = "ray-bucket-zydg2"
 create_ray_cluster              = true
 ray_cluster_name                = "ray-cluster"
 enable_grafana_on_ray_dashboard = false

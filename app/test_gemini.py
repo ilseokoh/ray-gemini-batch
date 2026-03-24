@@ -11,7 +11,7 @@ class TestGeminiIntegration(unittest.TestCase):
         This is an integration test and makes a real API call.
         """
         # --- ARRANGE ---
-        url = "gs://kevin-step1-bucket/expense.csv"
+        url = "gs://test-bucket22222222/expense.csv"
         content_type = "text/csv"
 
         expected_pii = {
