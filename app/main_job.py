@@ -1,21 +1,17 @@
 import ray
 import os
 import pandas as pd
-from gemini import call_gemini_with_attachment, call_gemini_with_csv, PIData
+from gemini import call_gemini_with_attachment, call_gemini_with_csv, PIData, call_gemini_with_txt
 from google.cloud import storage
 from typing import List
-
+from typing import Optional
 import json
 import time
 import tempfile
 import pandas as pd
 from pandas import DataFrame
 import pandas_gbq
-from gemini import call_gemini_with_attachment, call_gemini_with_csv, PIData, call_gemini_with_txt, detect_gcs_encoding, convert_gcs_encoding_to_utf8_cwd
-from google.cloud import storage
 from google.cloud.exceptions import NotFound
-from typing import List
-from typing import Optional
 from pandas.errors import ParserError
 
 
@@ -35,18 +31,19 @@ ds = ray.data.read_bigquery(
     SELECT
         *
     FROM
-        `csv_parse_ds`.`error_retry_work_csv_src_files` AS src
+        `csv_parse_ds`.`blue_db_csv_src_files` AS src
     WHERE
         NOT EXISTS(
-        SELECT
-            1
-        FROM
-            `{bq_table}` AS res
-        WHERE
-            src.uri = res.uri);
+            SELECT
+                1
+            FROM
+                `{bq_table}` AS res
+            WHERE
+                src.uri = res.uri
+            );
     """
 )
-
+#AND size >= 7340032 AND size < 173160589;
 @ray.remote
 def process_csv_chunk(df_chunk: pd.DataFrame) -> List[PIData]:
     """Calls Gemini API for a chunk of a large CSV file."""
@@ -238,7 +235,7 @@ def read_chunks_from_gcs(gcs_uri: str, chunk_size: int = 100000):
 def processing_analysis(batch: pd.DataFrame) -> pd.DataFrame:
     results = "[]"
     errors = ""
-    size_49mib = 1048570
+    size_49mib = 1048576
     #7340032 # 49 * 1024 * 1024 # 1048576
 
     for i in range(len(batch)):
@@ -257,7 +254,6 @@ def processing_analysis(batch: pd.DataFrame) -> pd.DataFrame:
                 results = "[]"
                 errors = ""
             elif file_size <= size_49mib:
-                print("Processing as a attachment file.")
                 results = call_gemini_with_attachment(url=uri, type=content_type)
                 errors = ""
             else: # File size is > 5MiB CSV 를 읽어서 Chucking 후 Gemini 호출
@@ -272,7 +268,7 @@ def processing_analysis(batch: pd.DataFrame) -> pd.DataFrame:
                     else: 
                         # GCS uri 에서 파일을 읽어서 기본 chunk 단위인 500000 캐릭터 단위로 잘라주는 iterator를 반환하는 함수를 호출
                         print("CSV Read ERROR: processing as a text file.")
-                        chunk_iterator = read_chunks_from_gcs(uri, chunk_size=200000)
+                        chunk_iterator = read_chunks_from_gcs(uri, chunk_size=600000)
                         chunk_tasks = [process_txt_chunk.remote(chunk) for chunk in chunk_iterator]
                     
                     # Get results and aggregate
@@ -289,11 +285,8 @@ def processing_analysis(batch: pd.DataFrame) -> pd.DataFrame:
                         results = "[]"
                     errors = ""
 
-                else:
-                    errors = f"File size ({file_size} bytes) exceeds 5MiB limit and is not a CSV file."
-
         except Exception as e:
-            print(f"================{str(e)}")
+            print(f"================ {str(e)} : {uri}")
             results = ""
             errors = str(e)
 
@@ -303,23 +296,7 @@ def processing_analysis(batch: pd.DataFrame) -> pd.DataFrame:
 
 batches = [create_batch_job.remote(batch) for batch in ds.iter_batches(batch_size=1000, batch_format="pandas")]
 
-# Get the results
-processed_batches = []
-while futures:
-    ready, not_ready = ray.wait(futures)
-    ready_batches = ray.get(ready)
-    processed_batches.extend(ready_batches)
-    # progressive save the data to BQ table
-    if ready_batches:
-        ready_df = pd.concat(ready_batches)
-        ready_df['result'] = ready_df['result'].apply(
-            lambda x: json.dumps([i.model_dump() for i in x], ensure_ascii=False) if isinstance(x, list) else x
-        )
-        pandas_gbq.to_gbq(ready_df, bq_table, project_id=project_id, if_exists='append')
-        
-        #ready_df.to_gbq(destination_table=bq_table, project_id=project_id, if_exists='append') # deprecated
-    futures = not_ready
-
+ray.get(batches)
 
 print("All batch jobs completed.")
 

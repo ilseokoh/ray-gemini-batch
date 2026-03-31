@@ -1,8 +1,8 @@
 ##common variables
-project_id = ""
+project_id = "pjt-lges-midata"
 
 ## This is required for terraform to connect to GKE cluster and deploy workloads.
-cluster_name     = "ray-enabled-gke"
+cluster_name     = "ray-gke"
 cluster_location = "asia-northeast3"
 
 ## If terraform should create a new GKE cluster, fill in this section as well.
